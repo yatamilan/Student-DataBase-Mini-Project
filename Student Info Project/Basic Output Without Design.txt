@@ -1,0 +1,192 @@
+import tkinter as tk
+from tkinter import messagebox
+import mysql.connector
+from mysql.connector import Error
+
+# Database connection function
+def create_connection():
+    try:
+        connection = mysql.connector.connect(
+            host="host",
+            user="user",
+            password="password",
+            database="database"
+        )
+        if connection.is_connected():
+            return connection
+    except Error as e:
+        messagebox.showerror("Database Error", f"Error connecting to the database: {e}")
+        return None
+
+# Function to close the connection
+def close_connection(connection):
+    if connection.is_connected():
+        connection.close()
+        print("Connection closed")
+
+# Function to add a student record
+def add_student(name, age, grade):
+    conn = create_connection()
+    if conn:
+        cursor = conn.cursor()
+        try:
+            query = "INSERT INTO students (name, age, grade) VALUES (%s, %s, %s)"
+            values = (name, age, grade)
+            cursor.execute(query, values)
+            conn.commit()
+            messagebox.showinfo("Success", f"Student '{name}' added successfully.")
+        except Error as e:
+            messagebox.showerror("Error", f"Error adding student: {e}")
+        finally:
+            cursor.close()
+            close_connection(conn)
+
+# Function to view all student records
+def view_students():
+    conn = create_connection()
+    if conn:
+        cursor = conn.cursor()
+        try:
+            query = "SELECT * FROM students"
+            cursor.execute(query)
+            records = cursor.fetchall()
+            if records:
+                record_str = "\n".join([f"ID: {record[0]}, Name: {record[1]}, Age: {record[2]}, Grade: {record[3]}" for record in records])
+                messagebox.showinfo("Student Records", record_str)
+            else:
+                messagebox.showinfo("No records", "No student records found.")
+        except Error as e:
+            messagebox.showerror("Error", f"Error fetching student records: {e}")
+        finally:
+            cursor.close()
+            close_connection(conn)
+
+# Function to update a student's details
+def update_student(student_id, name=None, age=None, grade=None):
+    conn = create_connection()
+    if conn:
+        cursor = conn.cursor()
+        try:
+            updates = []
+            if name:
+                updates.append(f"name='{name}'")
+            if age:
+                updates.append(f"age={age}")
+            if grade:
+                updates.append(f"grade='{grade}'")
+            
+            update_str = ", ".join(updates)
+            query = f"UPDATE students SET {update_str} WHERE id = {student_id}"
+            cursor.execute(query)
+            conn.commit()
+            if cursor.rowcount:
+                messagebox.showinfo("Success", f"Student ID {student_id} updated successfully.")
+            else:
+                messagebox.showerror("Error", f"Student ID {student_id} not found.")
+        except Error as e:
+            messagebox.showerror("Error", f"Error updating student: {e}")
+        finally:
+            cursor.close()
+            close_connection(conn)
+
+# Function to delete a student record
+def delete_student(student_id):
+    conn = create_connection()
+    if conn:
+        cursor = conn.cursor()
+        try:
+            query = f"DELETE FROM students WHERE id = {student_id}"
+            cursor.execute(query)
+            conn.commit()
+            if cursor.rowcount:
+                messagebox.showinfo("Success", f"Student ID {student_id} deleted successfully.")
+            else:
+                messagebox.showerror("Error", f"Student ID {student_id} not found.")
+        except Error as e:
+            messagebox.showerror("Error", f"Error deleting student: {e}")
+        finally:
+            cursor.close()
+            close_connection(conn)
+
+# Tkinter GUI window
+def main_window():
+    root = tk.Tk()
+    root.title("Student Management System")
+
+    # Add student section
+    tk.Label(root, text="Name:").grid(row=0, column=0, padx=10, pady=10)
+    name_entry = tk.Entry(root)
+    name_entry.grid(row=0, column=1, padx=10, pady=10)
+
+    tk.Label(root, text="Age:").grid(row=1, column=0, padx=10, pady=10)
+    age_entry = tk.Entry(root)
+    age_entry.grid(row=1, column=1, padx=10, pady=10)
+
+    tk.Label(root, text="Grade:").grid(row=2, column=0, padx=10, pady=10)
+    grade_entry = tk.Entry(root)
+    grade_entry.grid(row=2, column=1, padx=10, pady=10)
+
+    def add_student_ui():
+        name = name_entry.get()
+        age = age_entry.get()
+        grade = grade_entry.get()
+        if name and age and grade:
+            add_student(name, int(age), grade)
+        else:
+            messagebox.showwarning("Input Error", "All fields are required to add a student.")
+
+    add_button = tk.Button(root, text="Add Student", command=add_student_ui)
+    add_button.grid(row=3, column=1, padx=10, pady=10)
+
+    # View students button
+    view_button = tk.Button(root, text="View All Students", command=view_students)
+    view_button.grid(row=4, column=1, padx=10, pady=10)
+
+    # Update student section
+    tk.Label(root, text="Update Student (ID, Name, Age, Grade):").grid(row=5, column=0, padx=10, pady=10)
+
+    id_entry = tk.Entry(root)
+    id_entry.grid(row=6, column=0, padx=10, pady=10)
+
+    update_name = tk.Entry(root)
+    update_name.grid(row=6, column=1, padx=10, pady=10)
+
+    update_age = tk.Entry(root)
+    update_age.grid(row=6, column=2, padx=10, pady=10)
+
+    update_grade = tk.Entry(root)
+    update_grade.grid(row=6, column=3, padx=10, pady=10)
+
+    def update_student_ui():
+        student_id = id_entry.get()
+        name = update_name.get()
+        age = update_age.get()
+        grade = update_grade.get()
+        if student_id and (name or age or grade):
+            update_student(student_id, name=name if name else None, age=int(age) if age else None, grade=grade if grade else None)
+        else:
+            messagebox.showwarning("Input Error", "Student ID and at least one field are required to update.")
+
+    update_button = tk.Button(root, text="Update Student", command=update_student_ui)
+    update_button.grid(row=7, column=1, padx=10, pady=10)
+
+    # Delete student section
+    tk.Label(root, text="Delete Student (ID):").grid(row=8, column=0, padx=10, pady=10)
+
+    delete_entry = tk.Entry(root)
+    delete_entry.grid(row=9, column=0, padx=10, pady=10)
+
+    def delete_student_ui():
+        student_id = delete_entry.get()
+        if student_id:
+            delete_student(student_id)
+        else:
+            messagebox.showwarning("Input Error", "Student ID is required to delete a record.")
+
+    delete_button = tk.Button(root, text="Delete Student", command=delete_student_ui)
+    delete_button.grid(row=9, column=1, padx=10, pady=10)
+
+    root.mainloop()
+
+if __name__ == "__main__":
+    main_window()

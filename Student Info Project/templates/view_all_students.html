@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Students</title>
+    <style>
+        /* Styling for the entire page */
+        body {
+            font-family: Arial, sans-serif;
+            /* Set font style */
+            background-image: url('https://www.wallpapertip.com/wmimgs/49-493241_background-image-for-student-portal.jpg');
+            /* Add a background image */
+            background-size: cover;
+            /* Make sure the background image covers the whole page */
+            background-position: center;
+            /* Center the background image */
+            background-attachment: fixed;
+            /* Keep the background fixed while scrolling */
+            margin: 0;
+            padding: 20px;
+            color: #333;
+            /* Set text color */
+        }
+
+        /* Styling for the heading (All Students) */
+        h1 {
+            text-align: center;
+            /* Center the text */
+            color: #fff;
+            /* White color for the text */
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            /* Add shadow to the text for better readability */
+        }
+
+        /* Styling for the table where student data is displayed */
+        table {
+            width: 100%;
+            /* Make the table full width */
+            border-collapse: collapse;
+            /* Remove space between table borders */
+            margin: 20px 0;
+            /* Add margin (space) at the top and bottom of the table */
+            background-color: rgba(255, 255, 255, 0.6);
+            /* Reduced opacity for the white background */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            /* Add a shadow around the table */
+        }
+
+        /* Styling for the table headers and cells */
+        th,
+        td {
+            border: 1px solid #ddd;
+            /* Add a light border around table cells */
+            padding: 12px 15px;
+            /* Add padding inside the table cells */
+            text-align: left;
+            /* Align text to the left */
+            opacity: 0;
+            /* Make the cells invisible initially for fade-in effect */
+            transition: opacity 1s ease-out, transform 1s ease-out;
+            /* Animation for fading in and sliding up */
+        }
+
+        /* Styling for table headers */
+        th {
+            background-color: #4CAF50;
+            /* Green background for headers */
+            color: #fff;
+            /* White text color */
+            font-weight: bold;
+            /* Make the header text bold */
+        }
+
+        /* Styling for even-numbered table rows (for a striped effect) */
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+            /* Light gray background for even rows */
+        }
+
+        /* Add a hover effect when a row is hovered over */
+        tr:hover {
+            background-color: #ddd;
+            /* Change background color when hovering over a row */
+        }
+
+        /* Animation to fade in and slide up the table cells */
+        .fade-in {
+            opacity: 1;
+            /* Make the cells visible */
+            transform: translateY(0);
+            /* Reset the upward slide */
+        }
+
+        /* Initially, slide the table cells slightly upwards */
+        .fade-out {
+            opacity: 0;
+            /* Make the cells invisible */
+            transform: translateY(20px);
+            /* Slide the cells 20px upwards */
+        }
+    </style>
+</head>
+
+<body>
+    <!-- This heading tells what the page is about -->
+    <h1>All Students</h1>
+
+    <!-- This table shows the list of all students -->
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th> <!-- Column for student IDs -->
+                <th>Name</th> <!-- Column for student names -->
+                <th>Age</th> <!-- Column for student ages -->
+                <th>Grade</th> <!-- Column for student grades -->
+            </tr>
+        </thead>
+        <tbody>
+            <!-- The following code will automatically insert student data from the server -->
+            {% for student in students %}
+            <tr>
+                <td>{{ student.id }}</td> <!-- Display the student's ID -->
+                <td>{{ student.name }}</td> <!-- Display the student's name -->
+                <td>{{ student.age }}</td> <!-- Display the student's age -->
+                <td>{{ student.grade }}</td> <!-- Display the student's grade -->
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <script>
+        // This function checks if table cells are visible when we scroll
+        function handleScrollAnimation(entries, observer) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) { // If the table cells are visible
+                    entry.target.classList.add('fade-in'); // Add the fade-in effect
+                    entry.target.classList.remove('fade-out'); // Remove the fade-out effect
+                } else {
+                    entry.target.classList.remove('fade-in'); // Remove fade-in when not visible
+                    entry.target.classList.add('fade-out'); // Add fade-out effect
+                }
+            });
+        }
+
+        // Create an observer to watch the scrolling action
+        const observer = new IntersectionObserver(handleScrollAnimation, {
+            threshold: 0.1 // Activate when 10% of the element is visible
+        });
+
+        // Select all the table cells (td) and headers (th) for animation
+        const tableCells = document.querySelectorAll('td, th');
+
+        // Observe each cell to apply the fade-in and fade-out effect
+        tableCells.forEach(cell => {
+            observer.observe(cell); // Start observing each cell
+            cell.classList.add('fade-out'); // Start with the fade-out effect
+        });
+    </script>
+</body>
+
+</html>

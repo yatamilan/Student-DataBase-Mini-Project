@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Information Management</title>
+    <style>
+        /* This is the background of the whole page. */
+        body {
+            font-family: Arial, sans-serif; /* This sets the text style. */
+            background-image: url('/static/wp6430221-anime-guitar-girl-pc-wallpapers.jpg'); /* This sets the background picture. */
+            background-size: cover; /* This makes sure the picture covers the whole page. */
+            background-position: center; /* This centers the picture. */
+            background-attachment: fixed; /* This makes the picture stay in place when scrolling. */
+            margin: 0; /* This removes any extra space around the page. */
+            padding: 0; /* This removes extra space inside the page. */
+        }
+
+        /* This styles the box where all the forms are. */
+        .container {
+            width: 40%; /* This sets how wide the box is. */
+            max-height: 80vh; /* This makes sure the box doesn't get too tall. */
+            margin: 20px auto; /* This centers the box on the page and adds space around it. */
+            padding: 20px; /* This adds space inside the box. */
+            background: rgba(255, 255, 255, 0.2); /* This makes the box background a little see-through. */
+            border-radius: 20px; /* This rounds the corners of the box. */
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2); /* This adds a shadow around the box to make it stand out. */
+            backdrop-filter: blur(10px); /* This makes the area behind the box look blurry. */
+            -webkit-backdrop-filter: blur(10px); /* This is for older web browsers to make the blur work. */
+            overflow-y: auto; /* This lets you scroll if there’s too much content in the box. */
+            position: relative; /* This allows us to position other things inside the box. */
+        }
+
+        /* This adds a pattern to the background of the box. */
+        .container::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.1); /* This makes a light color on top of the background. */
+            border-radius: 20px; /* This rounds the corners of the pattern. */
+            pointer-events: none; /* This means you can’t click on the pattern. */
+            background-image: radial-gradient(circle, rgba(255, 255, 255, 0.4) 20%, transparent 30%),
+                radial-gradient(circle, rgba(255, 255, 255, 0.4) 20%, transparent 30%),
+                radial-gradient(circle, rgba(255, 255, 255, 0.4) 20%, transparent 30%); /* This creates a pretty pattern with circles. */
+            background-size: 10% 10%, 20% 20%, 15% 15%; /* This sets the size of the circles in the pattern. */
+            background-position: 10% 10%, 30% 30%, 50% 50%; /* This sets where the circles are placed. */
+            background-repeat: no-repeat; /* This makes sure the pattern doesn’t repeat itself. */
+        }
+
+        /* This styles the headings (like titles). */
+        h1, h2 {
+            text-align: center; /* This centers the text. */
+            color: #222; /* This sets the text color to dark gray. */
+        }
+
+        /* This adds space below each form section. */
+        .form-section {
+            margin-bottom: 30px; /* This adds space below each form section. */
+        }
+
+        /* This styles the labels (the text next to the boxes). */
+        label {
+            display: block; /* This makes sure the label takes up its own line. */
+            margin: 10px 0 5px; /* This adds space above and below the label. */
+            font-weight: bold; /* This makes the label text bold. */
+            color: #333; /* This sets the label text color to dark gray. */
+        }
+
+        /* This styles the input boxes where you type. */
+        input[type="number"],
+        input[type="text"] {
+            width: calc(100% - 20px); /* This makes the input boxes as wide as the container minus some space. */
+            padding: 8px; /* This adds space inside the input boxes. */
+            margin-bottom: 15px; /* This adds space below each input box. */
+            border: 1px solid #ccc; /* This adds a light gray border around the input boxes. */
+            border-radius: 4px; /* This rounds the corners of the input boxes. */
+            font-size: 16px; /* This sets the text size inside the input boxes. */
+            color: #333; /* This sets the text color inside the input boxes. */
+        }
+
+        /* This styles the buttons. */
+        button {
+            padding: 10px 15px; /* This adds space inside the button. */
+            border: none; /* This removes the border around the button. */
+            border-radius: 4px; /* This rounds the corners of the button. */
+            background-color: #007bff; /* This sets the button color to blue. */
+            color: #fff; /* This sets the text color on the button to white. */
+            font-size: 16px; /* This sets the text size on the button. */
+            cursor: pointer; /* This changes the mouse cursor to a pointer when hovering over the button. */
+            transition: background-color 0.3s; /* This makes the button color change smoothly when you hover over it. */
+        }
+
+        /* This changes the button color when you hover over it. */
+        button:hover {
+            background-color: #0056b3; /* This makes the button color darker when you hover over it. */
+        }
+
+        /* This centers the buttons at the bottom of the form. */
+        .button-section {
+            text-align: center; /* This centers the buttons. */
+        }
+
+        /* This styles the flash messages that pop up on the screen. */
+        .flash {
+            padding: 10px; /* This adds space inside the flash message box. */
+            margin-bottom: 15px; /* This adds space below the flash message box. */
+            border-radius: 5px; /* This rounds the corners of the flash message box. */
+            color: #fff; /* This sets the text color in the flash message to white. */
+            text-align: center; /* This centers the text in the flash message. */
+        }
+
+        /* This styles the success flash message (for successful actions). */
+        .flash.success {
+            background-color: #4CAF50; /* This sets the background color to green. */
+        }
+
+        /* This styles the error flash message (for errors). */
+        .flash.error {
+            background-color: #f44336; /* This sets the background color to red. */
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Student Information Management</h1>
+
+        <!-- This section shows messages that pop up. -->
+        {% with messages = get_flashed_messages(with_categories=True) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="flash {{ category }}">{{ message }}</div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        <!-- This is the form to add a new student. -->
+        <form id="addStudentForm" action="/add_student" method="POST" class="form-section">
+            <h2>Add Student</h2>
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required>
+            <label for="age">Age:</label>
+            <input type="number" id="age" name="age" required>
+            <label for="grade">Grade:</label>
+            <input type="text" id="grade" name="grade" required>
+            <button type="submit">Add Student</button>
+        </form>
+
+        <!-- This is the button to view all students. -->
+        <div class="button-section">
+            <form action="/view_all_students" method="get">
+                <button type="submit">View All Students</button>
+            </form>
+        </div>
+
+        <!-- This is the form to update a student's information. -->
+        <form id="updateStudentForm" action="/update_student" method="POST" class="form-section">
+            <h2>Update Student</h2>
+            <label for="updateId">ID:</label>
+            <input type="number" id="updateId" name="updateId" required>
+            <label for="updateName">Name:</label>
+            <input type="text" id="updateName" name="updateName">
+            <label for="updateAge">Age:</label>
+            <input type="number" id="updateAge" name="updateAge">
+            <label for="updateGrade">Grade:</label>
+            <input type="text" id="updateGrade" name="updateGrade">
+            <button type="submit">Update Student</button>
+        </form>
+
+        <!-- This is the form to delete a student. -->
+        <form id="deleteStudentForm" action="/delete_student" method="POST" class="form-section">
+            <h2>Delete Student</h2>
+            <label for="deleteId">ID:</label>
+            <input type="number" id="deleteId" name="deleteId" required>
+            <button type="submit">Delete Student</button>
+        </form>
+    </div>
+</body>
+
+</html>
