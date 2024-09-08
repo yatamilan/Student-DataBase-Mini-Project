@@ -1,0 +1,13 @@
+Needed Libraries are 
+blinker
+click
+colorama
+Flask
+Flask-MySQLdb
+itsdangerous
+Jinja2
+MarkupSafe
+mysql-connector-python
+mysqlclient
+pip
+Werkzeug
