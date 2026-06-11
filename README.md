@@ -21,7 +21,7 @@ A simple Student Information Management System developed as a mini project to ma
 
 ## 📂 Project Structure
 
-```text Student Info Project/ │ ├── main.py ├── database.py ├── student.db ├── assets/ ├── screenshots/ └── **README**.md ```
+```text Student Info Project/ │ ├── main.py ├── database.py ├── student.db ├── assets/ ├── screenshots/ ```
 
 ## 🚀 Installation
 
