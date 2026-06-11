@@ -70,9 +70,6 @@ This mini project was developed to learn:
 - **GUI** development
 - Data management concepts
 
-## 📸 Screenshots
-
-Add screenshots of your application here.
 
 ## 🔮 Future Improvements
 
